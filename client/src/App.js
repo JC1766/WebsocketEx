@@ -3,7 +3,9 @@ import io from 'socket.io-client';
 import './App.css';
 
 function App() {
+  const rooms = ["room1", "room2"];
   const [state, setState] = useState({ message: '', name: '' });
+  const [room, setRoom] = useState(null);
   const [chat, setChat] = useState([]);
 
   const socketRef = useRef();
@@ -14,6 +16,12 @@ function App() {
       socketRef.current.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    socketRef.current.emit('room_join', ({name, room}) => {
+      setRoom(room);
+    })
+  }, [room]);
 
   useEffect(() => {
     socketRef.current.on('message', ({ name, message }) => {
@@ -45,6 +53,15 @@ function App() {
     msgEle.focus();
   };
 
+  const onRoomChange = (e) => {
+    let roomEle = e.target;
+    console.log([roomEle.name], roomEle.value);
+    setRoom(roomEle.value);
+    socketRef.current.on("room_join", {
+      name: state.name,
+    }, room);
+  };
+
   const renderChat = () => {
     return chat.map(({ name, message }, index) => (
       <div key={index}>
@@ -57,7 +74,7 @@ function App() {
 
   return (
     <div>
-      {state.name && (
+      {state.name && room && (
         <div className="card">
           <div className="render-chat">
             <h1>Chat Log</h1>
@@ -78,7 +95,15 @@ function App() {
         </div>
       )}
 
-      {!state.name && (
+      {state.name && !room && (
+        <div className="card">
+          <h1>Which room would you like to join?</h1>
+          <button onClick={onRoomChange} id="roomSelect1" name="room1">Room 1</button>
+          <button onClick={onRoomChange} id="roomSelect2" name="room2">Room 2</button>
+        </div>
+      )}
+
+      {!state.name && !room && (
         <form
           className="form"
           onSubmit={(e) => {
