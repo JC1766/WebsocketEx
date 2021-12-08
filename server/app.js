@@ -13,9 +13,10 @@ io.on('connection', (socket) => {
   });
   
   // adding rooms
-  socket.on('room_join', (name,room) => {
-    socket.join(room);
-    socket.to(room).emit('room_join',name);
+  socket.on('room_join', (name,newroom, oldroom) => {
+    socket.leave(oldroom)
+    socket.join(newroom);
+    socket.to(newroom).emit('room_join',name);
   });
   // send message to specific room
   socket.on('message', ({ name, message },room) => {
