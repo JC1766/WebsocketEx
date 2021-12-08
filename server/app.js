@@ -6,11 +6,10 @@ io.on('connection', (socket) => {
   console.log('new client connected', socket.id);
 
   // join general room when you connect
-  socket.join("general");
-
+  
   socket.on('user_join', (name) => {
+    socket.join("general");
     io.to("general").emit('user_join', name);
-    
   });
   
   // adding rooms
