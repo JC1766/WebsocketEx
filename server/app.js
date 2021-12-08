@@ -9,6 +9,9 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('user_join', name);
   });
 
+  const count = io.engine.clientsCount;
+  console.log('num clients: ',count);
+
   socket.on('message', ({ name, message }) => {
     console.log(name, message, socket.id);
     io.emit('message', { name, message });
