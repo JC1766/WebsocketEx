@@ -6,9 +6,9 @@ function App() {
   const rooms = ["room1", "room2"];
   const [state, setState] = useState({ message: '', name: '' });
   const [room, setRoom] = useState("general");
-  // const [chat, setChat] = useState([]);
+  const [chat, setChat] = useState([]);
   // // object of roomname: array of objects
-  const [chat, setChat] = useState({});
+  // const [chat, setChat] = useState({});
 
   const socketRef = useRef();
 
@@ -20,35 +20,37 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // socketRef.current.on('message', ({ name, message }) => {
+    //   let c = chat;
+    //   c[room] = [...c[room], { name, message } ];
+    //   setChat(c);
+    // });
     socketRef.current.on('message', ({ name, message }) => {
-      let c = chat;
-      c[room] = [...c[room], { name, message } ];
-      setChat(c);
+      setChat([...chat, { name, message }]);
+    });
+    socketRef.current.on('user_join', function (data) {
+      setChat([
+        ...chat,
+        { name: 'ChatBot', message: `${data} has joined the chat` }
+      ]);
     });
     // socketRef.current.on('user_join', function (data) {
-    //   setChat([
-    //     ...chat,
-    //     { name: 'ChatBot', message: `${data} has joined the chat` }
-    //   ]);
+    //   let c = chat;
+    //   if (!c[room]){
+    //     c[room] = [];
+    //   }
+    //   c[room] = [...c[room], { name: 'ChatBot', message: `${data} has joined the chat` } ];
+    //   console.log(c);
+    //   setChat(c);
+    //   console.log(chat);
     // });
-    socketRef.current.on('user_join', function (data) {
-      let c = chat;
-      if (!c[room]){
-        c[room] = [];
-      }
-      c[room] = [...c[room], { name: 'ChatBot', message: `${data} has joined the chat` } ];
-      console.log(c);
-      setChat(c);
-      console.log(chat);
-    });
 
     socketRef.current.on('room_join', function (data) {
-      let c = chat;
-      if (!c[room]){
-        c[room] = [];
-      }
-      c[room] = [...c[room], { name: 'ChatBot', message: `${data} has joined the chat` } ];
-      setChat(c);
+      // setChat([]);
+      // console.log(chat);
+      setChat([
+        { name: 'ChatBot', message: `${data} has joined the chat` }
+      ]);
     });
   }, [chat,room]);
 
@@ -58,7 +60,7 @@ function App() {
 
   const onMessageSubmit = (e) => {
     let msgEle = document.getElementById('message');
-    console.log([msgEle.name], msgEle.value);
+    // console.log([msgEle.name], msgEle.value);
     setState({ ...state, [msgEle.name]: msgEle.value });
     socketRef.current.emit('message', {
       name: state.name,
@@ -70,29 +72,27 @@ function App() {
     msgEle.focus();
   };
 
-  const onRoomChange = (e) => {
-    let roomEle = document.getElementById()
-    console.log([roomEle.name], roomEle.value);
+  const onRoomChange = (newroom) => {
     let oldRoom = room;
     setRoom(newroom);
     socketRef.current.emit("room_join", state.name, newroom, oldRoom);
   };
 
   const renderChat = () => {
-    if (!chat[room]){
-      return ;
-    }
-    else{
-      console.log(chat);
-      return chat[room].map(({ name, message }, index) => 
-      (
-        <div key={index}>
-          <h3>
-            {name}: <span>{message}</span>
-          </h3>
-        </div>
-      ));
-    }
+    // if (!chat[room]){
+    //   return ;
+    // }
+    // else{
+    //   console.log(chat);
+    //   return chat[room].map(({ name, message }, index) => 
+    //   (
+    //     <div key={index}>
+    //       <h3>
+    //         {name}: <span>{message}</span>
+    //       </h3>
+    //     </div>
+    //   ));
+    // }
     return chat.map(({ name, message }, index) => (
       <div key={index}>
         <h3>
