@@ -20,9 +20,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // socketRef.current.on('message', ({ name, message }) => {
-    //   setChat([...chat, { name, message }]);
-    // });
     socketRef.current.on('message', ({ name, message }) => {
       let c = chat;
       c[room] = [...c[room], { name, message } ];
@@ -77,8 +74,8 @@ function App() {
     let roomEle = document.getElementById()
     console.log([roomEle.name], roomEle.value);
     let oldRoom = room;
-    setRoom(roomEle.value);
-    socketRef.current.emit("room_join", state.name, room, oldRoom);
+    setRoom(newroom);
+    socketRef.current.emit("room_join", state.name, newroom, oldRoom);
   };
 
   const renderChat = () => {
@@ -128,7 +125,7 @@ function App() {
           </form>
           <div>
             {rooms.map((r, i) => 
-              <button onClick={onRoomChange} key={i}>{r}</button>
+              <button onClick={() => onRoomChange(r)} key={i}>{r}</button>
             )}
           </div>
         </div>
