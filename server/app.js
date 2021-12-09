@@ -20,12 +20,14 @@ io.on('connection', (socket) => {
   });
   // send message to specific room
   socket.on('message', ({ name, message },room) => {
-    console.log(room, name, message, socket.id);
-    io.to(room).emit('message', { name, message });
+    if(room !== "general"){
+      console.log(room, name, message, socket.id);
+      io.to(room).emit('message', { name, message });
+    }
   });
   // const count = io.engine.clientsCount;
   // console.log('num clients: ',count);
-
+  
   socket.on('message', ({ name, message }) => {
     console.log(name, message, socket.id);
     io.to("general").emit('message', { name, message });

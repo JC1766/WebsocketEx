@@ -5,7 +5,7 @@ import './App.css';
 function App() {
   const rooms = ["room1", "room2"];
   const [state, setState] = useState({ message: '', name: '' });
-  const [room, setRoom] = useState(null);
+  const [room, setRoom] = useState("general");
   const [chat, setChat] = useState([]);
 
   const socketRef = useRef();
@@ -18,9 +18,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    socketRef.current.emit('room_join', ({name, room}) => {
-      setRoom(room);
-    })
+
   }, [room]);
 
   useEffect(() => {
@@ -46,7 +44,7 @@ function App() {
     socketRef.current.emit('message', {
       name: state.name,
       message: msgEle.value
-    });
+    }, room);
     e.preventDefault();
     setState({ message: '', name: state.name });
     msgEle.value = '';
@@ -54,12 +52,11 @@ function App() {
   };
 
   const onRoomChange = (e) => {
-    let roomEle = e.target;
+    let roomEle = document.get
     console.log([roomEle.name], roomEle.value);
+    let oldRoom = room;
     setRoom(roomEle.value);
-    socketRef.current.on("room_join", {
-      name: state.name,
-    }, room);
+    socketRef.current.emit("room_join", state.name, room, oldRoom);
   };
 
   const renderChat = () => {
@@ -74,9 +71,10 @@ function App() {
 
   return (
     <div>
-      {state.name && room && (
+      {state.name && (
         <div className="card">
           <div className="render-chat">
+            <h1>#{room}</h1>
             <h1>Chat Log</h1>
             {renderChat()}
           </div>
@@ -92,18 +90,15 @@ function App() {
             </div>
             <button>Send Message</button>
           </form>
+          <div>
+            {rooms.map((r, i) => 
+              <button onClick={onRoomChange} key={i}>{r}</button>
+            )}
+          </div>
         </div>
       )}
 
-      {state.name && !room && (
-        <div className="card">
-          <h1>Which room would you like to join?</h1>
-          <button onClick={onRoomChange} id="roomSelect1" name="room1">Room 1</button>
-          <button onClick={onRoomChange} id="roomSelect2" name="room2">Room 2</button>
-        </div>
-      )}
-
-      {!state.name && !room && (
+      {!state.name && (
         <form
           className="form"
           onSubmit={(e) => {
