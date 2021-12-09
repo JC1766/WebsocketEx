@@ -18,10 +18,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-
-  }, [room]);
-
-  useEffect(() => {
     socketRef.current.on('message', ({ name, message }) => {
       setChat([...chat, { name, message }]);
     });
@@ -51,12 +47,10 @@ function App() {
     msgEle.focus();
   };
 
-  const onRoomChange = (e) => {
-    let roomEle = document.get
-    console.log([roomEle.name], roomEle.value);
+  const onRoomChange = (newroom) => {
     let oldRoom = room;
-    setRoom(roomEle.value);
-    socketRef.current.emit("room_join", state.name, room, oldRoom);
+    setRoom(newroom);
+    socketRef.current.emit("room_join", state.name, newroom, oldRoom);
   };
 
   const renderChat = () => {
@@ -92,7 +86,7 @@ function App() {
           </form>
           <div>
             {rooms.map((r, i) => 
-              <button onClick={onRoomChange} key={i}>{r}</button>
+              <button onClick={() => onRoomChange(r)} key={i}>{r}</button>
             )}
           </div>
         </div>

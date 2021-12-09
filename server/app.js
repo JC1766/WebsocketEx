@@ -24,14 +24,13 @@ io.on('connection', (socket) => {
       console.log(room, name, message, socket.id);
       io.to(room).emit('message', { name, message });
     }
+    else{
+      console.log(name, message, socket.id);
+      io.to("general").emit('message', { name, message });
+    }
   });
   // const count = io.engine.clientsCount;
   // console.log('num clients: ',count);
-  
-  socket.on('message', ({ name, message }) => {
-    console.log(name, message, socket.id);
-    io.to("general").emit('message', { name, message });
-  });
 
   socket.on('disconnect', () => {
     console.log('Disconnect Fired');
