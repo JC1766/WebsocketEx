@@ -48,7 +48,7 @@ function App() {
     socketRef.current.on('room_join', function (data) {
       // setChat([]);
       // console.log(chat);
-      setChat([
+      setChat([...chat,
         { name: 'ChatBot', message: `${data} has joined the chat` }
       ]);
     });
@@ -75,6 +75,7 @@ function App() {
   const onRoomChange = (newroom) => {
     let oldRoom = room;
     setRoom(newroom);
+    setChat([]);
     socketRef.current.emit("room_join", state.name, newroom, oldRoom);
   };
 
