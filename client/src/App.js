@@ -6,7 +6,9 @@ function App() {
   const rooms = ["room1", "room2"];
   const [state, setState] = useState({ message: '', name: '' });
   const [room, setRoom] = useState("general");
-  const [chat, setChat] = useState([]);
+  // const [chat, setChat] = useState([]);
+  // // object of roomname: array of objects
+  const [chat, setChat] = useState({});
 
   const socketRef = useRef();
 
@@ -18,20 +20,40 @@ function App() {
   }, []);
 
   useEffect(() => {
-
-  }, [room]);
-
-  useEffect(() => {
+    // socketRef.current.on('message', ({ name, message }) => {
+    //   setChat([...chat, { name, message }]);
+    // });
     socketRef.current.on('message', ({ name, message }) => {
-      setChat([...chat, { name, message }]);
+      let c = chat;
+      c[room] = [...c[room], { name, message } ];
+      setChat(c);
     });
+    // socketRef.current.on('user_join', function (data) {
+    //   setChat([
+    //     ...chat,
+    //     { name: 'ChatBot', message: `${data} has joined the chat` }
+    //   ]);
+    // });
     socketRef.current.on('user_join', function (data) {
-      setChat([
-        ...chat,
-        { name: 'ChatBot', message: `${data} has joined the chat` }
-      ]);
+      let c = chat;
+      if (!c[room]){
+        c[room] = [];
+      }
+      c[room] = [...c[room], { name: 'ChatBot', message: `${data} has joined the chat` } ];
+      console.log(c);
+      setChat(c);
+      console.log(chat);
     });
-  }, [chat]);
+
+    socketRef.current.on('room_join', function (data) {
+      let c = chat;
+      if (!c[room]){
+        c[room] = [];
+      }
+      c[room] = [...c[room], { name: 'ChatBot', message: `${data} has joined the chat` } ];
+      setChat(c);
+    });
+  }, [chat,room]);
 
   const userjoin = (name) => {
     socketRef.current.emit('user_join', name);
@@ -52,7 +74,7 @@ function App() {
   };
 
   const onRoomChange = (e) => {
-    let roomEle = document.get
+    let roomEle = document.getElementById()
     console.log([roomEle.name], roomEle.value);
     let oldRoom = room;
     setRoom(roomEle.value);
@@ -60,6 +82,20 @@ function App() {
   };
 
   const renderChat = () => {
+    if (!chat[room]){
+      return ;
+    }
+    else{
+      console.log(chat);
+      return chat[room].map(({ name, message }, index) => 
+      (
+        <div key={index}>
+          <h3>
+            {name}: <span>{message}</span>
+          </h3>
+        </div>
+      ));
+    }
     return chat.map(({ name, message }, index) => (
       <div key={index}>
         <h3>
@@ -67,8 +103,8 @@ function App() {
         </h3>
       </div>
     ));
-  };
-
+  }; 
+  
   return (
     <div>
       {state.name && (

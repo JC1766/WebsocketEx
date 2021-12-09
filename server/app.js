@@ -13,25 +13,27 @@ io.on('connection', (socket) => {
   });
   
   // adding rooms
-  socket.on('room_join', (name,newroom, oldroom) => {
+  socket.on('room_join', (name, newroom, oldroom) => {
     socket.leave(oldroom)
     socket.join(newroom);
-    socket.to(newroom).emit('room_join',name);
+    io.to(newroom).emit('room_join',name);
   });
   // send message to specific room
   socket.on('message', ({ name, message },room) => {
-    if(room !== "general"){
-      console.log(room, name, message, socket.id);
-      io.to(room).emit('message', { name, message });
-    }
+    // if(room !== "general"){
+    //   console.log(room, name, message, socket.id);
+    //   io.to(room).emit('message', { name, message });
+    // }
+    console.log(room, name, message, socket.id);
+    io.to(room).emit('message', { name, message });
   });
   // const count = io.engine.clientsCount;
   // console.log('num clients: ',count);
-  
-  socket.on('message', ({ name, message }) => {
-    console.log(name, message, socket.id);
-    io.to("general").emit('message', { name, message });
-  });
+
+  // socket.on('message', ({ name, message }) => {
+  //   console.log(name, message, socket.id);
+  //   io.to("general").emit('message', { name, message });
+  // });
 
   socket.on('disconnect', () => {
     console.log('Disconnect Fired');
